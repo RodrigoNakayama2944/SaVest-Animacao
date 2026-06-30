@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sobre Nós - Capacete e Colete Inteligentes</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      overflow: auto;
+      padding: 40px;
+      display: block;
+      height: auto;
+      min-height: 100vh;
+    }
+    .about-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 12px;
+      padding: 40px;
+    }
+    .about-container h1 {
+      color: #e94560;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .about-container h2 {
+      color: #e94560;
+      font-size: 18px;
+      margin-top: 28px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #0f3460;
+      padding-bottom: 6px;
+    }
+    .about-container p {
+      color: #ccc;
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .about-container ul {
+      color: #ccc;
+      font-size: 15px;
+      line-height: 1.7;
+      padding-left: 24px;
+      margin-bottom: 14px;
+    }
+    .about-container li {
+      margin-bottom: 6px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 10px 24px;
+      background: #e94560;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: opacity 0.2s;
+    }
+    .back-link:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <div class="about-container">
+    <h1>Sobre Nós</h1>
+    <p>Proteger quem constrói o futuro é a nossa prioridade. Imagine um ambiente de trabalho onde cada acidente — uma queda de altura, o impacto de uma ferramenta na cabeça — gera uma resposta imediata, sem que o trabalhador precise pedir ajuda. Nosso protótipo de capacete e colete inteligentes faz exatamente isso: sensores embarcados identificam automaticamente situações de risco extremo e disparam, em segundos, uma notificação com a localização para o colega mais próximo e para o supervisor. Mais do que um equipamento de segurança, é uma rede de socorro instantâneo que transforma minutos decisivos em vidas preservadas.</p>
+
+    <p>Para alcançar um preço verdadeiramente acessível sem perder a essência da proteção inteligente, refinamos a engenharia até a forma mais enxuta e eficiente possível. O coração do sistema é um único microcontrolador ESP32, que se comunica diretamente entre os dispositivos via protocolo ESP-NOW — sem necessidade de roteadores, gateways ou qualquer infraestrutura adicional. Um sensor de movimento de seis eixos MPU6050 de baixíssimo custo, instalado no capacete, detecta quedas e impactos perigosos com precisão. A notificação ao supervisor utiliza um módulo SIM800L que envia SMS com a localização baseada na triangulação da rede celular, dispensando o uso de GPS dedicado e seu custo extra. Quando um acidente é identificado, o colete emite um alerta sonoro local e, ao mesmo tempo, transmite um sinal de emergência via ESP-NOW que ativa imediatamente o aviso sonoro e luminoso no colete do trabalhador mais próximo — indicando exatamente quem deve prestar socorro. Tudo é alimentado por uma bateria recarregável de longa duração, garantindo o funcionamento por toda a jornada de trabalho.</p>
+
+    <p>O resultado é um kit completo (capacete + colete) com preço final de apenas R$ 197,00. É menos do que muitas empresas gastam mensalmente com café na obra, mas entrega uma redução drástica no tempo de resposta a acidentes e fortalece a cultura de cuidado ativo entre a equipe. Nosso sistema prova que é possível oferecer qualidade, comunicação descentralizada e localização funcional por um valor que cabe em qualquer planilha, sem exigir infraestrutura complexa ou mensalidades. Se você busca implementar uma solução de segurança acessível, que não pesa no orçamento e ainda assim cumpre o papel de salvar vidas, convidamos você a conhecer de perto essa inovação. Segurança de qualidade não precisa ser cara — e nós estamos aqui para provar. Venha construir esse futuro com a gente.</p>
+
+    <a class="back-link" href="index.html">Voltar para o simulador</a>
+  </div>
+</body>
+</html>

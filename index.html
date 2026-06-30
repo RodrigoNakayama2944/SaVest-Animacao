@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Detecção de Queda de Trabalhador</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <div id="sidebar">
+      <div class="panel">
+        <h2>Monitor de Segurança</h2>
+        <div class="status-row">
+          <span class="label">Trabalhador:</span>
+          <span class="value">João</span>
+        </div>
+        <div class="status-row">
+          <span class="label">Colete:</span>
+          <span class="value" id="vest-status">✅ Ligado</span>
+        </div>
+        <div class="status-row">
+          <span class="label">Altura:</span>
+          <span class="value" id="height-display">6.0m</span>
+        </div>
+        <div class="status-row">
+          <span class="label">Status:</span>
+          <span class="value" id="status-badge">🟢 Seguro</span>
+        </div>
+        <div class="status-row">
+          <span class="label">Limite de Queda:</span>
+          <span class="value">1.8m</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Controles</h2>
+        <button id="btn-trigger-fall" class="btn btn-danger">Simular Queda</button>
+        <button id="btn-step-phase" class="btn btn-secondary" disabled>Avançar Fase</button>
+        <button id="btn-reset" class="btn btn-secondary">Reiniciar</button>
+        <a href="about.html" id="btn-about">Sobre nós</a>
+      </div>
+    </div>
+
+    <div id="scene-container">
+      <canvas id="scene" width="800" height="600"></canvas>
+      <div id="height-indicator">
+        <div class="height-mark" style="bottom: 90%;">6m</div>
+        <div class="height-mark" style="bottom: 75%;">4.5m</div>
+        <div class="height-mark" style="bottom: 60%;">3m</div>
+        <div class="height-mark" style="bottom: 45%;">1.8m</div>
+        <div class="height-mark" style="bottom: 25%;">0m</div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
