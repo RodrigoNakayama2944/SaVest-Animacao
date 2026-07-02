@@ -34,6 +34,9 @@ let phase2Timer = 0;
 let phase2Stage = 0;
 let phase2CompleteDelay = 0;
 
+let transitionOverlayActive = false;
+let transitionOverlayTimer = 0;
+
 const fallingObj = {
   x: 260,
   y: PLATFORM_Y - 20,
@@ -151,6 +154,9 @@ function drawScene() {
 
   drawPhaseOverlay();
   drawParticles();
+  if (transitionOverlayActive) {
+    drawTransitionOverlay();
+  }
   if (phase2Active) {
     drawPhase2();
   }
@@ -1315,6 +1321,8 @@ function resetScene() {
   lookout.alerted = false;
   lookout.reacting = false;
   lookout.reactionTimer = 0;
+  transitionOverlayActive = false;
+  transitionOverlayTimer = 0;
   updateHeightDisplay();
   loop();
 }
@@ -1370,20 +1378,12 @@ function update() {
 
   updateHeightDisplay();
 
-  if (rescuePhase === PHASE.COMPLETE && !phase2Active) {
+  if (rescuePhase === PHASE.COMPLETE && !phase2Active && !transitionOverlayActive) {
     phase2CompleteDelay++;
-    if (phase2CompleteDelay > 240) {
-      startPhase2();
+    if (phase2CompleteDelay > 180) {
+      transitionOverlayActive = true;
     }
   }
-
-  const stepBtn = document.getElementById('btn-step-phase');
-  if (stepBtn) {
-    const canStep = rescuePhase !== PHASE.COMPLETE && (worker.state === STATE.DOWN || worker.state === STATE.FALLING || rescuePhase >= PHASE.POINTING);
-    stepBtn.disabled = !canStep;
-  }
-
-
 
   if (rescuePhase === PHASE.COMPLETE && !phase2Active) {
     ctx.save();
@@ -1393,76 +1393,6 @@ function update() {
     ctx.textAlign = 'center';
     ctx.fillText('💚', ambulance.targetX + 30, GROUND_Y - 60);
     ctx.restore();
-  }
-}
-
-function stepPhase() {
-  if (worker.state === STATE.WORKING && !alarmed) return;
-  if (rescuePhase === PHASE.NONE && !alarmed) {
-    alarmed = true;
-    document.getElementById('status-badge').textContent = '🔴 Alarm';
-    document.getElementById('status-badge').className = 'value danger';
-  }
-
-  if (rescuePhase === PHASE.NONE) {
-    rescuePhase = PHASE.POINTING;
-    phaseTimer = 0;
-    rescuer.reacting = false;
-    rescuer.arrived = false;
-    rescuer.targetX = worker.landX || worker.x;
-  } else if (rescuePhase === PHASE.POINTING) {
-    rescuePhase = PHASE.AMBULANCE;
-    phaseTimer = 0;
-    playSirenSound();
-  } else if (rescuePhase === PHASE.AMBULANCE) {
-    ambulance.x = ambulance.targetX;
-    ambulance.arrived = true;
-    ambulance.doorOpen = true;
-    rescuePhase = PHASE.PARAMEDICS;
-    phaseTimer = 0;
-    para1.active = true;
-    para1.x = ambulance.x - 55;
-    para1.targetX = (worker.landX || worker.x) + 20;
-    para1.exitDelay = 0;
-    para2.active = true;
-    para2.x = ambulance.x - 55;
-    para2.targetX = (worker.landX || worker.x) - 10;
-    para2.exitDelay = 30;
-  } else if (rescuePhase === PHASE.PARAMEDICS) {
-    [para1, para2].forEach(p => {
-      if (!p.active) return;
-      p.exitDelay = 0;
-      p.x = p.targetX;
-      p.arrived = true;
-    });
-    rescuePhase = PHASE.CARRYING;
-    phaseTimer = 0;
-    worker.state = STATE.RESCUING;
-    [para1, para2].forEach((p, i) => {
-      p.targetBackX = ambulance.x - 25 + i * 16;
-      p.carrying = false;
-      p.carryDone = false;
-    });
-  } else if (rescuePhase === PHASE.CARRYING) {
-    [para1, para2].forEach(p => {
-      if (!p.active) return;
-      p.x = p.targetBackX;
-      p.carryDone = true;
-      p.carrying = true;
-    });
-    rescuePhase = PHASE.LOADING;
-    phaseTimer = 0;
-    ambulance.doorOpen = false;
-  } else if (rescuePhase === PHASE.LOADING) {
-    phaseTimer = 40;
-    rescuePhase = PHASE.DEPARTING;
-  } else if (rescuePhase === PHASE.DEPARTING) {
-    rescuePhase = PHASE.COMPLETE;
-    worker.state = STATE.RESCUED;
-    document.getElementById('status-badge').textContent = '✅ Rescued';
-    document.getElementById('status-badge').className = 'value safe';
-    spawnSparkles(ambulance.x - 55, GROUND_Y - 40);
-    playChimeSound();
   }
 }
 
@@ -1510,7 +1440,9 @@ function updatePhase2() {
       phase2Stage = 2;
       phase2Timer = 0;
       fallingObj.active = true;
-      fallingObj.x = worker.x + (Math.random() * 30 - 15);
+      const dist = (worker.y - 22) - (PLATFORM_Y - 30);
+      const fallTime = Math.sqrt(2 * dist / 0.5);
+      fallingObj.x = Math.max(70, Math.min(540, worker.x + worker.vx * fallTime + (Math.random() * 8 - 4)));
       fallingObj.y = PLATFORM_Y - 30;
       fallingObj.vy = 0;
     }
@@ -1521,7 +1453,7 @@ function updatePhase2() {
     fallingObj.y += fallingObj.vy;
 
     const workerHeadY = worker.y - 22;
-    if (fallingObj.y >= workerHeadY && Math.abs(fallingObj.x - worker.x) < 18) {
+    if (fallingObj.y >= workerHeadY && Math.abs(fallingObj.x - worker.x) < 12) {
       phase2Stage = 3;
       phase2Timer = 0;
       fallingObj.active = false;
@@ -1534,15 +1466,7 @@ function updatePhase2() {
     }
 
     if (fallingObj.y > GROUND_Y) {
-      phase2Stage = 3;
-      phase2Timer = 0;
       fallingObj.active = false;
-      worker.state = STATE.DOWN;
-      worker.landX = worker.x;
-      knockedOut = true;
-      spawnDust(worker.x, GROUND_Y);
-      screenShake();
-      updateStatusUI('danger');
     }
   }
 
@@ -1628,37 +1552,95 @@ function drawPhase2() {
     const sx = fallingObj.x;
     const sy = fallingObj.y;
 
-    const glow = Math.sin(Date.now() / 60) * 0.3 + 0.7;
-    ctx.shadowColor = '#ff4400';
-    ctx.shadowBlur = 20 * glow;
+    const pipeLen = 45;
+    const pipeW = 5;
+    const angle = Math.atan2(fallingObj.vy, 1) + Math.PI / 2;
 
-    ctx.fillStyle = '#ff4400';
+    ctx.translate(sx, sy);
+    ctx.rotate(angle);
+
+    const grad = ctx.createLinearGradient(-pipeW, 0, pipeW, 0);
+    grad.addColorStop(0, '#5a5a5a');
+    grad.addColorStop(0.25, '#9a9a9a');
+    grad.addColorStop(0.5, '#c8c8c8');
+    grad.addColorStop(0.75, '#9a9a9a');
+    grad.addColorStop(1, '#4a4a4a');
+
+    ctx.shadowColor = 'rgba(0,0,0,0.25)';
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+
+    ctx.fillStyle = grad;
     ctx.beginPath();
-    ctx.moveTo(sx - 10, sy + 6);
-    ctx.lineTo(sx - 7, sy - 8);
-    ctx.lineTo(sx + 4, sy - 13);
-    ctx.lineTo(sx + 13, sy - 4);
-    ctx.lineTo(sx + 10, sy + 8);
-    ctx.closePath();
+    ctx.roundRect(-pipeW, -pipeLen / 2, pipeW * 2, pipeLen, pipeW);
     ctx.fill();
 
-    ctx.fillStyle = '#ffcc00';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.strokeStyle = '#3a3a3a';
+    ctx.lineWidth = 0.8;
     ctx.beginPath();
-    ctx.arc(sx - 2, sy - 4, 4, 0, Math.PI * 2);
+    ctx.roundRect(-pipeW, -pipeLen / 2, pipeW * 2, pipeLen, pipeW);
+    ctx.stroke();
+
+    ctx.fillStyle = '#888';
+    ctx.beginPath();
+    ctx.ellipse(0, -pipeLen / 2, pipeW - 1, 2.5, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.strokeStyle = 'rgba(255,255,200,0.6)';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 4; i++) {
-      const ly2 = sy - 18 - i * 7;
-      ctx.beginPath();
-      ctx.moveTo(sx - 7 + i * 3, ly2);
-      ctx.lineTo(sx + 7 - i * 3, ly2 + 3);
-      ctx.stroke();
-    }
+    ctx.fillStyle = '#444';
+    ctx.beginPath();
+    ctx.ellipse(0, -pipeLen / 2, pipeW - 3, 1.5, 0, 0, Math.PI * 2);
+    ctx.fill();
 
     ctx.restore();
   }
+}
+
+function drawTransitionOverlay() {
+  ctx.save();
+
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.fillStyle = '#1a1a2e';
+  const bx = W / 2 - 220, by = H / 2 - 44, bw = 440, bh = 88;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, 10);
+    ctx.fill();
+  } else {
+    ctx.fillRect(bx, by, bw, bh);
+  }
+
+  ctx.strokeStyle = '#0f3460';
+  ctx.lineWidth = 2;
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(bx, by, bw, bh, 10);
+    ctx.stroke();
+  } else {
+    ctx.strokeRect(bx, by, bw, bh);
+  }
+
+  ctx.fillStyle = '#e94560';
+  ctx.font = 'bold 12px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('PRÓXIMA CENA', W / 2, H / 2 - 20);
+
+  ctx.fillStyle = '#eee';
+  ctx.font = '15px sans-serif';
+  ctx.fillText('Queda de objeto na área do trabalhador', W / 2, H / 2 + 8);
+
+  ctx.fillStyle = '#888';
+  ctx.font = '11px sans-serif';
+  ctx.fillText('Clique em qualquer lugar para continuar', W / 2, H / 2 + 32);
+
+  ctx.restore();
 }
 
 function loop() {
@@ -1673,6 +1655,12 @@ function loop() {
 
 document.getElementById('btn-trigger-fall').addEventListener('click', startFall);
 document.getElementById('btn-reset').addEventListener('click', resetScene);
-document.getElementById('btn-step-phase').addEventListener('click', stepPhase);
+
+canvas.addEventListener('click', () => {
+  if (transitionOverlayActive) {
+    transitionOverlayActive = false;
+    startPhase2();
+  }
+});
 
 loop();
