@@ -1663,4 +1663,20 @@ canvas.addEventListener('click', () => {
   }
 });
 
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebar-overlay');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('active');
+});
+
+overlay.addEventListener('click', () => {
+  hamburger.classList.remove('active');
+  sidebar.classList.remove('open');
+  overlay.classList.remove('active');
+});
+
 loop();

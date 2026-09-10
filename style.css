@@ -208,3 +208,159 @@ body {
   background: #e94560;
   border-radius: 2px;
 }
+
+/* Hamburger button - hidden on desktop */
+#hamburger {
+  display: none;
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1001;
+  width: 40px;
+  height: 40px;
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+#hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #e94560;
+  border-radius: 1px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+#hamburger.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+#hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+
+#hamburger.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(5px, -5px);
+}
+
+#sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+#sidebar-overlay.active {
+  display: block;
+}
+
+/* =============== RESPONSIVE =============== */
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto;
+    height: auto;
+  }
+
+  #app {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  #hamburger {
+    display: flex;
+  }
+
+  #sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    border-right: none;
+    border-right: 2px solid #0f3460;
+  }
+
+  #sidebar.open {
+    left: 0;
+  }
+
+  #scene-container {
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #scene {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  #height-indicator {
+    right: 8px;
+    top: 10px;
+    bottom: 10px;
+    width: 30px;
+  }
+
+  .height-mark {
+    font-size: 9px;
+    right: 2px;
+  }
+
+  .btn {
+    padding: 14px;
+    font-size: 16px;
+  }
+
+  #hint-text {
+    font-size: 13px;
+  }
+
+  .panel h2 {
+    font-size: 14px;
+  }
+
+  .status-row {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  #sidebar {
+    width: 260px;
+    left: -260px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  #height-indicator {
+    width: 24px;
+    right: 4px;
+  }
+
+  .height-mark {
+    font-size: 8px;
+    right: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  #hamburger {
+    display: none;
+  }
+}
